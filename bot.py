@@ -12,23 +12,16 @@ intents.typing = False
 intents.presences = False
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+
+async def get_bot_mention_prefix(bot, message):
+    return [f'<@!{bot.user.id}> ', f'<@{bot.user.id}> ']
+
+bot = commands.Bot(command_prefix=get_bot_mention_prefix, intents=intents)
 
 
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if bot.user.mentioned_in(message):
-        await message.channel.send(f'Hello, {message.author.mention}! I\'m RileyBot, How can I help you today?')
-
-    await bot.process_commands(message)
 
 
 @bot.command()
