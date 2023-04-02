@@ -182,7 +182,7 @@ async def fetch_news_articles(api_key, query, language="en"):
 @bot.command()
 async def news(ctx, query: str):
     # Replace with your API key from NewsAPI.org
-    api_key = "78d50591ba5b42c6a22c77fe2aa4d1bc"
+    api_key = ""
     articles = await fetch_news_articles(api_key, query)
 
     if not articles:
@@ -202,7 +202,7 @@ async def news(ctx, query: str):
         await ctx.send(embed=embed)
 
 
-TOKEN = 'MTA2NzI5MzIxMDExMzc1MzEyOA.GNmNDn.uuCDS4rlP5imyrTB92aAAP2UECK0AP_xzakhGI'
+TOKEN = ''
 
 bot.run(TOKEN)
 
