@@ -6,6 +6,7 @@ import asyncio
 from discord.ext import commands
 import pytz
 from datetime import datetime
+import json
 
 intents = discord.Intents.default()
 intents.typing = False
@@ -166,6 +167,42 @@ async def time(ctx, timezone: str):
     await ctx.send(embed=embed)
 
 
-TOKEN = ''
+async def fetch_news_articles(api_key, query, language="en"):
+    url = f"https://newsapi.org/v2/everything?q={query}&language={language}&apiKey={api_key}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.json()
+            if data["status"] == "ok":
+                return data["articles"]
+            else:
+                return []
+
+
+@bot.command()
+async def news(ctx, query: str):
+    # Replace with your API key from NewsAPI.org
+    api_key = "78d50591ba5b42c6a22c77fe2aa4d1bc"
+    articles = await fetch_news_articles(api_key, query)
+
+    if not articles:
+        await ctx.send("No news articles found.")
+        return
+
+    for article in articles[:5]:  # Display up to 5 articles
+        embed = discord.Embed(
+            title=article["title"],
+            url=article["url"],
+            description=article["description"],
+            color=discord.Color.blue(),
+        )
+        embed.set_footer(text=article["source"]["name"])
+        if article["urlToImage"]:
+            embed.set_thumbnail(url=article["urlToImage"])
+        await ctx.send(embed=embed)
+
+
+TOKEN = 'MTA2NzI5MzIxMDExMzc1MzEyOA.GNmNDn.uuCDS4rlP5imyrTB92aAAP2UECK0AP_xzakhGI'
 
 bot.run(TOKEN)
+
