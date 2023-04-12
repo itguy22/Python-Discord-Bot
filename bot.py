@@ -11,8 +11,6 @@ import json
 intents = discord.Intents.default()
 intents.typing = False
 intents.presences = False
-intents.message_content = True
-
 class DurationConverter(commands.Converter):
     async def convert(self, ctx, argument):
         try:
@@ -27,7 +25,7 @@ class DurationConverter(commands.Converter):
 async def get_bot_mention_prefix(bot, message):
     return [f'<@!{bot.user.id}> ', f'<@{bot.user.id}> ']
 
-bot = commands.Bot(command_prefix=get_bot_mention_prefix, intents=intents)
+bot = commands.Bot(command_prefix='/', intents=intents)
 
 
 @bot.event
@@ -230,7 +228,7 @@ async def remind(ctx, duration: int, *, reminder_text: str):
 
     reminders.append(reminder)
 
-    await ctx.stend(f"{ctx.author.mention} I will remind you in {duration} seconds.")
+    await ctx.send(f"{ctx.author.mention} I will remind you in {duration} seconds.")
     await asyncio.sleep(duration)
 
     reminders.remove(reminder)
