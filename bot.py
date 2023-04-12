@@ -3,7 +3,7 @@ import random
 import aiohttp
 import html
 import asyncio
-from discord.ext import commands
+from discord.ext import commands, BadArgument
 import pytz
 from datetime import datetime
 import json
@@ -12,6 +12,16 @@ intents = discord.Intents.default()
 intents.typing = False
 intents.presences = False
 intents.message_content = True
+
+class DurationConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            duration = int(argument)
+            if duration < 1:
+                raise ValueError("Duration must be greater than 0.")
+            return duration
+        except ValueError as e:
+            raise BadArgument(str(e))
 
 
 async def get_bot_mention_prefix(bot, message):
@@ -202,10 +212,6 @@ async def news(ctx, query: str):
         await ctx.send(embed=embed)
 
 
-@bot.command()
-async def feet(ctx):
-    await ctx.send("Subscribe to my feetfinder!")
-
 reminders = []
 
 
@@ -230,6 +236,14 @@ async def remind(ctx, duration: int, *, reminder_text: str):
     reminders.remove(reminder)
 
     await ctx.send(f"{ctx.author.mention}, here's your reminder: {reminder_text}")
+    
+@remind.error
+async def remind_error(ctx, error):
+    if isinstance(error, BadArgument):
+        await ctx.send(f"Error: {error}")
+    else:
+        raise error
+
 
 TOKEN = ''
 
