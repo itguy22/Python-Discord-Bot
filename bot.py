@@ -235,12 +235,15 @@ async def remind(ctx, duration: int, *, reminder_text: str):
 
     await ctx.send(f"{ctx.author.mention}, here's your reminder: {reminder_text}")
     
-@remind.error
+# Error handling for missing arguments
+@bot.command()
 async def remind_error(ctx, error):
-    if isinstance(error, BadArgument):
-        await ctx.send(f"Error: {error}")
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Please provide the proper syntax: `/remind <duration in seconds> <reminder text>`")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("Please ensure the duration is an integer.")
     else:
-        raise error
+        await ctx.send("An unexpected error occurred.")
 
 
 TOKEN = ''
