@@ -3,14 +3,17 @@ import random
 import aiohttp
 import html
 import asyncio
-from discord.ext import commands, BadArgument
+from discord.ext import commands
+from discord.ext.commands import BadArgument
 import pytz
 from datetime import datetime
 import json
 
 intents = discord.Intents.default()
+intents.message_content = True
 intents.typing = False
 intents.presences = False
+
 class DurationConverter(commands.Converter):
     async def convert(self, ctx, argument):
         try:
@@ -233,10 +236,13 @@ async def remind(ctx, duration: int, *, reminder_text: str):
 
     reminders.remove(reminder)
 
-    await ctx.send(f"{ctx.author.mention}, here's your reminder: {reminder_text}")
+    # Create a DM channel and send the reminder message there
+    dm_channel = await ctx.author.create_dm()
+    await dm_channel.send(f"Here's your reminder: {reminder_text}")
+
     
 # Error handling for missing arguments
-@bot.command()
+@remind.error
 async def remind_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Please provide the proper syntax: `/remind <duration in seconds> <reminder text>`")
