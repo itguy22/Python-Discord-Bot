@@ -4,6 +4,7 @@ import aiohttp
 import html
 import asyncio
 from discord.ext import commands
+from discord import Interaction
 from discord.ext.commands import BadArgument
 import pytz
 from datetime import datetime
@@ -30,15 +31,14 @@ async def get_bot_mention_prefix(bot, message):
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 
-
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
 
-@bot.command()
+"""@bot.command()
 async def ping(ctx):
-    await ctx.send('Pong!')
+    await ctx.send('Pong!')"""
 
 
 @bot.command()
@@ -240,7 +240,7 @@ async def remind(ctx, duration: int, *, reminder_text: str):
     dm_channel = await ctx.author.create_dm()
     await dm_channel.send(f"Here's your reminder: {reminder_text}")
 
-    
+
 # Error handling for missing arguments
 @remind.error
 async def remind_error(ctx, error):
@@ -251,6 +251,9 @@ async def remind_error(ctx, error):
     else:
         await ctx.send("An unexpected error occurred.")
 
+@bot.command(description="Sends the bot's latency.")
+async def pingtest(ctx):
+    await ctx.send(f"Pong! Latency is {bot.latency}")
 
 TOKEN = ''
 
