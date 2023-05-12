@@ -9,6 +9,10 @@ from discord.ext.commands import BadArgument
 import pytz
 from datetime import datetime
 import json
+import requests
+from alpha_vantage.timeseries import TimeSeries
+from dotenv import load_dotenv
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -253,8 +257,30 @@ async def remind_error(ctx, error):
 
 @bot.command(description="Sends the bot's latency.")
 async def pingtest(ctx):
-    await ctx.send(f"Pong! Latency is {bot.latency}")
+    await ctx.send(f"Ping sent. Latency is {bot.latency}")
 
-TOKEN = ''
+alpha_vantage_key = ''
+ts = TimeSeries(key=alpha_vantage_key)
 
-bot.run(TOKEN)
+@bot.command()
+async def stock(ctx, symbol: str):
+    # Fetch the stock data
+    data, _ = ts.get_quote_endpoint(symbol)
+
+    # Extract the price and the volume
+    price = data['05. price']
+    volume = data['06. volume']
+
+    # Send a message with the data
+    await ctx.send(f'The current price of {symbol} is ${price} and the volume is {volume}.')
+
+@stock.error
+async def stock_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        if error.param.name == 'symbol':
+            await ctx.send('You did not provide a stock symbol.')
+    else:
+        raise error
+
+load_dotenv()
+token = os.getenv('DISCORD_TOKEN')
